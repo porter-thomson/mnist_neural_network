@@ -1,35 +1,37 @@
 
 // #include the .h
 #include "DataLoader.h"
-#include <fstream>
 
-DataLoader::DataLoader(const string& images_file_name, const string& labels_file_name,
-  uint32_t batch_size) {
-  if (images_file_name) {
-  
-  }
-  if (labels_file_name) {
+#include <numeric>
+#include <algorithm>
+#include <random>
 
-  }
-  batch_size_ = batch_size;
-  loadImages(images_file_name);
-  loadLabels(labels_file_name);
-}
 
 bool DataLoader::hasNext() const {
-
+  return (current_index_ < indices_.size());
 }
 
 pair<vector<Eigen::VectorXf>, vector<uint8_t>> DataLoader::nextBatch() {
-
+  size_t end = std::min(current_index_ + (size_t)batch_size_, indices_.size());
+  uint32_t iter = (uint32_t)(end - current_index_);
+  vector<Eigen::VectorXf> images(iter);
+  vector<uint8_t> labels(iter);
+  for (uint32_t i = 0; i < iter; i++) {
+    images[i] = images_[indices_[current_index_ + i]];
+    labels[i] = labels_[indices_[current_index_ + i]];
+  }
+  current_index_ = end;
+  return std::make_pair(images, labels);
 }
 
 void DataLoader::reset() {
-
+  current_index_ = 0;
 }
 
 void DataLoader::shuffle() {
-
+  std::mt19937 rand(std::random_device{}());
+  std::shuffle(indices_.begin(), indices_.end(), rand);
+  reset();
 }
 
 void DataLoader::loadImages(const string& path) {
@@ -43,15 +45,18 @@ void DataLoader::loadImages(const string& path) {
     throw std::runtime_error("Invalid magic number for images file");
   }
 
-  uint32_t num_images = readBigEndianUint32(image_file);
+  num_images_ = readBigEndianUint32(image_file);
   uint32_t rows = readBigEndianUint32(image_file);
   uint32_t cols = readBigEndianUint32(image_file);
 
-  images_.resize(num_images);
+  indices_.resize(num_images_);
+  std::iota(indices_.begin(), indices_.end(), 0);
+
+  images_.resize(num_images_);
   uint32_t num_pixels = rows * cols;
-  uint8_t buf[num_pixels];
-  for (uint32_t i = 0; i < num_images; i++) {
-    image_file.read(reinterpret_cast<char*>(buf), num_pixels);
+  vector<uint8_t> buf(num_pixels);
+  for (uint32_t i = 0; i < num_images_; i++) {
+    image_file.read(reinterpret_cast<char*>(buf.data()), num_pixels);
 
     Eigen::VectorXf image(num_pixels);
     for (uint32_t j = 0; j < num_pixels; j++) {
@@ -72,6 +77,11 @@ void DataLoader::loadLabels(const string& path) {
     throw std::runtime_error("Invalid magic number for label file");
   }
   uint32_t num_labels = readBigEndianUint32(label_file);
+  if (num_labels != num_images_) {
+    throw std::runtime_error("Number of images (" + std::to_string(num_images_) +
+                         ") and labels (" + std::to_string(num_labels) + ") do not match");
+  }
+
   labels_.resize(num_labels);
   label_file.read(reinterpret_cast<char*>(labels_.data()), num_labels);
 }
