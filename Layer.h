@@ -1,4 +1,8 @@
-
+/* Copyright @2026 Porter Thomson
+ * porterrt@uw.edu
+ * The Layer class represents a single Layer in a neural network
+ *
+*/
 
 #pragma once
 #include <cstdint>
@@ -11,31 +15,34 @@ enum class Activation {
 
 class Layer {
   public:
-  Layer(int input_size, int output_size, Activation act) :
-    input_size_(input_size), 
-    output_size_(output_size), 
-    act_(act) {
-      weights_.resize(output_size_, input_size_);
-      HeInitialization();
-      bias_ = Eigen::VectorXf::Zero(output_size_);
-  }
-  ~Layer() = default;
-  Layer(const Layer& other) = delete;
-  Layer& operator=(const Layer& other) = delete;
+    Layer(int input_size, int output_size, Activation act) :
+      input_size_(input_size), 
+      output_size_(output_size), 
+      act_(act) {
+        weights_.resize(output_size_, input_size_);
+        HeInitialization();
+        bias_ = Eigen::VectorXf::Zero(output_size_);
+    }
+    ~Layer() = default;
+    Layer(const Layer& other) = delete;
+    Layer& operator=(const Layer& other) = delete;
 
-  void Forward(const Eigen::MatrixXf& input);
+    /* Computes 
+    */
+    void Forward(const Eigen::MatrixXf& input);
 
-  Eigen::MatrixXf Backward(Eigen::MatrixXf& error,
-    const Eigen::MatrixXf& prev_activation);
+    Eigen::MatrixXf Backward(Eigen::MatrixXf& error,
+      const Eigen::MatrixXf& prev_activation, const float& eta);
+
+    const MatrixXf& GetActivation() const { return activation_; }
 
 
   private:
-  uint32_t input_size_;
-  uint32_t output_size_;
-  float eta_;
-  Eigen::MatrixXf weights_;
-  Eigen::MatrixXf activation_;
-  Eigen::VectorXf bias_;
-  Activation act_;
-  void HeInitialization();
+    uint32_t input_size_;
+    uint32_t output_size_;
+    Eigen::MatrixXf weights_;
+    Eigen::MatrixXf activation_;
+    Eigen::VectorXf bias_;
+    Activation act_;
+    void HeInitialization();
 };

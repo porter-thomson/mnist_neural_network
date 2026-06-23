@@ -6,7 +6,7 @@
 
 using namespace Eigen;
 
-void Forward(const MatrixXf& input) {
+void Layer::Forward(const MatrixXf& input) {
   if (input.row() != input_size_) {
     throw std::runtime_error("Incorrect Vector size of: "
       + std::to_string(input.rows()) + " Expected: " + std::to_string(input_size_));
@@ -25,7 +25,7 @@ void Forward(const MatrixXf& input) {
   }
 }
 
-MatrixXf Backward(MatrixXf& error, const MatrixXf& prev_activation) {
+MatrixXf Layer::Backward(MatrixXf& error, const MatrixXf& prev_activation, const float& eta) {
   switch (act_) {
     case Activation::RELU: {
       MatrixXf d_a = (activation_.array() > 0.0f).cast<float>();
@@ -38,12 +38,11 @@ MatrixXf Backward(MatrixXf& error, const MatrixXf& prev_activation) {
 
   MatrixXf prev_error = weights_.transpose() * error;
 
-  weights_ = weights_ - ((eta_/error.cols()) * error * prev_activation.transpose());
-  bias_ = bias_ - ((eta_/error.cols()) * error.rowwise().sum());
+  weights_ = weights_ - ((eta/error.cols()) * error * prev_activation.transpose());
+  bias_ = bias_ - ((eta/error.cols()) * error.rowwise().sum());
 
   return prev_error;
 }
-
 
 void Layer::HeInitialization() {
   float sd = std::sqrt(2.0 / weights_.cols());

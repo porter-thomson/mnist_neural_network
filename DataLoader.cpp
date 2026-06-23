@@ -11,7 +11,7 @@ bool DataLoader::hasNext() const {
   return (current_index_ < indices_.size());
 }
 // change this to Eigen::MatrixXf
-pair<vector<Eigen::VectorXf>, vector<uint8_t>> DataLoader::nextBatch() {
+pair<Eigen::MatrixXf, vector<uint8_t>> DataLoader::nextBatch() {
   size_t end = std::min(current_index_ + (size_t)batch_size_, indices_.size());
   uint32_t iter = (uint32_t)(end - current_index_);
   vector<Eigen::VectorXf> images(iter);

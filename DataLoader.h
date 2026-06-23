@@ -27,7 +27,7 @@ class DataLoader {
 
   bool hasNext() const;
 
-  pair<vector<Eigen::VectorXf>, vector<uint8_t>> nextBatch();
+  pair<Eigen::MatrixXf, vector<uint8_t>> nextBatch();
 
   void reset();
 
