@@ -7,6 +7,7 @@
 #pragma once
 #include <cstdint>
 #include <Eigen/Dense>
+#include <fstream>
 
 enum class Activation {
   RELU,
@@ -16,19 +17,16 @@ enum class Activation {
 class Layer {
   public:
     Layer(int input_size, int output_size, Activation act) :
-      input_size_(input_size), 
-      output_size_(output_size), 
       act_(act) {
-        weights_.resize(output_size_, input_size_);
+        weights_.resize(output_size, input_size);
         HeInitialization();
-        bias_ = Eigen::VectorXf::Zero(output_size_);
+        bias_ = Eigen::VectorXf::Zero(output_size);
     }
+    Layer(std::ifstream& file);
     ~Layer() = default;
     Layer(const Layer& other) = delete;
     Layer& operator=(const Layer& other) = delete;
 
-    /* Computes 
-    */
     void Forward(const Eigen::MatrixXf& input);
 
     Eigen::MatrixXf Backward(Eigen::MatrixXf& error,
@@ -36,10 +34,10 @@ class Layer {
 
     const MatrixXf& GetActivation() const { return activation_; }
 
+    void Save(std::ofstream& file);
+
 
   private:
-    uint32_t input_size_;
-    uint32_t output_size_;
     Eigen::MatrixXf weights_;
     Eigen::MatrixXf activation_;
     Eigen::VectorXf bias_;

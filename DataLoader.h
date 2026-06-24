@@ -33,8 +33,6 @@ class DataLoader {
 
   void shuffle();
 
-
-
   private:
   size_t current_index_;
   uint32_t batch_size_;

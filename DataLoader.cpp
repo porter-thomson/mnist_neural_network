@@ -5,23 +5,28 @@
 #include <numeric>
 #include <algorithm>
 #include <random>
+#include <utility>
+
+using namespace Eigen;
 
 
 bool DataLoader::hasNext() const {
   return (current_index_ < indices_.size());
 }
 // change this to Eigen::MatrixXf
-pair<Eigen::MatrixXf, vector<uint8_t>> DataLoader::nextBatch() {
+pair<MatrixXf, vector<uint8_t>> DataLoader::nextBatch() {
   size_t end = std::min(current_index_ + (size_t)batch_size_, indices_.size());
   uint32_t iter = (uint32_t)(end - current_index_);
-  vector<Eigen::VectorXf> images(iter);
+  MatrixXf images(images_[0].size(), iter);
+
   vector<uint8_t> labels(iter);
   for (uint32_t i = 0; i < iter; i++) {
-    images[i] = images_[indices_[current_index_ + i]];
+    images.col(i) = images_[indices_[current_index_ + i]];
     labels[i] = labels_[indices_[current_index_ + i]];
   }
   current_index_ = end;
-  return std::make_pair(images, labels);
+  auto pair = std::make_pair(images, labels);
+  return pair;
 }
 
 void DataLoader::reset() {
