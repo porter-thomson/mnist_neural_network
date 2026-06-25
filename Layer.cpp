@@ -90,5 +90,3 @@ void Layer::HeInitialization() {
     return (float) dist(rand);
   });
 }
-
-

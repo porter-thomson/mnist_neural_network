@@ -17,7 +17,7 @@ using std::pair;
 class DataLoader {
   public:
   DataLoader(const string& images_file_name, const string& labels_file_name,
-    uint32_t batch_size) : batch_size_(batch_size) {
+    uint32_t batch_size) : batch_size_(batch_size), current_index_(0) {
       loadImages(images_file_name);
       loadLabels(labels_file_name);
     }
@@ -39,7 +39,7 @@ class DataLoader {
   uint32_t num_images_;
   vector<Eigen::VectorXf> images_;
   vector<uint8_t> labels_;
-  vector<uint8_t> indices_;
+  vector<uint32_t> indices_;
   void loadImages(const string& path);
   void loadLabels(const string& path);
   uint32_t readBigEndianUint32(std::ifstream& f);

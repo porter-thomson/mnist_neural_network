@@ -24,15 +24,15 @@ class Layer {
     }
     Layer(std::ifstream& file);
     ~Layer() = default;
-    Layer(const Layer& other) = delete;
-    Layer& operator=(const Layer& other) = delete;
+    Layer(const Layer& other) = default;
+    Layer& operator=(const Layer& other) = default;
 
     void Forward(const Eigen::MatrixXf& input);
 
     Eigen::MatrixXf Backward(Eigen::MatrixXf& error,
       const Eigen::MatrixXf& prev_activation, const float& eta);
 
-    const MatrixXf& GetActivation() const { return activation_; }
+    const Eigen::MatrixXf& GetActivation() const { return activation_; }
 
     void Save(std::ofstream& file);
 

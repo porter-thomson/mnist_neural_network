@@ -19,13 +19,13 @@ Network::Network(const vector<uint32_t>& layer_sizes, const vector<Activation>& 
   if (layer_sizes.size() - 1 != acts.size()) {
     throw std::runtime_error("Invalid sizes of vector");
   }
-  for (int i = 0; i < acts.size(); i++) {
+  for (uint16_t i = 0; i < acts.size(); i++) {
     layers_.push_back(Layer(layer_sizes[i], layer_sizes[i + 1], acts[i]));
   }
   eta_ = 0.01f;
 }
 
-Network::Network(std::string& filename) {
+Network::Network(const std::string& filename) {
   ifstream file(filename, std::ios::binary);
   if (!file.is_open()) {
     throw std::runtime_error("Couldn't open file");
@@ -41,12 +41,12 @@ Network::Network(std::string& filename) {
 float Network::Train(pair<MatrixXf, vector<uint8_t>> batch) {
   MatrixXf error = ForwardProp(batch.first);
   float cost = 0.0f;
-  for (int i = 0; i < batch.second.size(); i++) {
+  for (uint32_t i = 0; i < batch.second.size(); i++) {
     cost -= std::log(error(batch.second[i], i));
     error(batch.second[i], i) -= 1.0f;
   }
   cost /= batch.second.size();
-  for (int i = layers_.size() - 1; i >= 0; i--) {
+  for (int i = static_cast<int>(layers_.size()) - 1; i >= 0; i--) {
     if (i != 0) {
       error = layers_[i].Backward(error, layers_[i - 1].GetActivation(), eta_);
     } else {
@@ -57,7 +57,7 @@ float Network::Train(pair<MatrixXf, vector<uint8_t>> batch) {
 }
 
 MatrixXf Network::ForwardProp(const MatrixXf& input) {
-  for (int i = 0; i < layers_.size(); i++) {
+  for (uint16_t i = 0; i < layers_.size(); i++) {
     if (i == 0) {
       layers_[i].Forward(input);
     } else {
@@ -78,7 +78,7 @@ vector<uint8_t> Network::Predict(const MatrixXf& input) {
   return ret;
 }
 
-void Network::Save(std::string& filename) {
+void Network::Save(const std::string& filename) {
   ofstream file(filename, std::ios::binary);
   if (!file.is_open()) {
     throw std::runtime_error("File couldn't be opened.");
@@ -91,5 +91,3 @@ void Network::Save(std::string& filename) {
   }
   file.close();
 }
-
-
