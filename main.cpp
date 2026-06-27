@@ -56,8 +56,8 @@ float TestNetwork(Network& network, DataLoader& test_loader, vector<vector<int>>
 // Calculates the Pricision and Recall and then prints it out.
 // Method is only called by PrintConfusion so no nullptr check needed.
 void PrintPrecisionRecall(vector<vector<int>>* confusion) {
-  std::cout << std::endl << "Per-class Precision / Recall:" << std::endl;
-  std::cout << std::setw(8) << "Class" << std::setw(12) << "Precision" << std::setw(12) << "Recall" << std::endl;
+  std::cout << std::endl << "Per-Digit Precision / Recall:" << std::endl;
+  std::cout << std::setw(8) << "Digit" << std::setw(12) << "Precision" << std::setw(12) << "Recall" << std::endl;
 
   for (int i = 0; i < (int)confusion->size(); i++) {
     int true_positive = (*confusion)[i][i];
